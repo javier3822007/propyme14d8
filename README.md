@@ -98,7 +98,7 @@ Si la diferencia supera los $10, revisar:
 - Que los valores de IVA Débito y Crédito Fiscal estén ingresados correctamente
 - Que las Notas de Crédito y Débito coincidan con el RCV oficial
 
-###La aplicación utiliza `double` + redondeo explícito en lugar de `BigDecimal`.
+### La aplicación utiliza `double` + redondeo explícito en lugar de `BigDecimal`.
 
 Motivos:
 - El sistema opera principalmente con pesos chilenos enteros.

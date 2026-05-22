@@ -1,0 +1,185 @@
+CHANGELOG — ProPyme Transparente
+=================================
+
+Formato: las versiones se listan en orden cronológico inverso (más
+reciente arriba). Versionado semántico: MAJOR.MINOR.PATCH.
+
+Estados:
+  v0.x.x   → Desarrollo y release candidates
+  v1.0.0   → Primera versión estable (cuando esté validada por usuarios reales)
+
+
+=================================
+[v0.9.0] — 2026-05  ·  Primer Release Candidate público
+=================================
+
+NUEVO:
+- Impresión del Balance Tributario en formato estándar contable chileno.
+  Encabezado de empresa, tabla 8 columnas, subtotal, utilidad/pérdida del
+  ejercicio, totales finales, notas legales y líneas para firmas.
+  Usa Java Print API nativa — permite imprimir en papel o "Imprimir a PDF"
+  desde el sistema operativo. Cero dependencias externas.
+- Archivo NotasLegales.java con constantes legales hardcodeadas (Régimen
+  14D N°8 LIR, Art. 100 Código Tributario), marcadas para revisión manual
+  si cambia la legislación.
+- Botones del Balance reorganizados con textos cortos y separadores
+  visuales por grupo: Datos / Editar / Salida.
+
+
+=================================
+[v0.6.0] — 2026-05  ·  Alineación con criterio SII y refinamientos
+=================================
+
+CORRECCIONES CRÍTICAS (CalculadorImpuesto):
+- Cód. 1614 (compras afectas) ahora se calcula como Math.round(IVA CF/0.19)
+  mes a mes — mismo criterio que el SII. Diferencia con SII reducida de
+  ~$10 a $0-$1 (redondeo).
+- Las notas NC/ND de compras ya están reflejadas en el IVA CF que ingresa
+  el contador, por lo que NO se restan/suman adicionalmente.
+
+UI:
+- Coloreo de discrepancia IVA: las celdas IVA Débito (ingresos) e IVA CF
+  (egresos) se ponen en amarillo pastel cuando el valor difiere del
+  cálculo automático. Tooltip muestra el valor esperado.
+- Headers más limpios en columnas de notas: "Neto NC" / "Neto ND".
+
+
+=================================
+[v0.5.0] — 2026-05  ·  Notas de Crédito y Débito
+=================================
+
+NUEVO:
+- Soporte completo para Notas de Crédito (NC) y Notas de Débito (ND) en
+  ventas y compras. NC resta del neto, ND suma. Cuatro columnas nuevas
+  en DatosMensualesPanel.
+- IVA Débito y IVA CF se calculan ahora sobre el neto efectivo
+  (neto - NC + ND) × 0.19.
+- PPM mensual considera las notas en su base de cálculo.
+- Base PPM ajustada por notas en CalculadorImpuesto y getBasePPM() de
+  DatosMes.
+
+MODELO:
+- DatosMes: 4 campos nuevos con getters/setters
+  (notasCreditoVenta, notasDebitoVenta, notasCreditoCompra, notasDebitoCompra).
+- DataStore: serialización JSON de los nuevos campos. Compatible hacia
+  atrás (ejercicios viejos cargan con notas en 0).
+
+BUGFIX: Capital aportado inicio actividades (Cód. 1573) ahora se ingresa
+en AntecedentesPanel y se persiste correctamente.
+
+
+=================================
+[v0.4.0] — 2026-05  ·  Robustez y madurez
+=================================
+
+CORRECCIONES CRÍTICAS:
+- Bug array de dividendos: protección defensiva contra null y tamaños
+  inesperados en CalculadorImpuesto.
+- Bug "fuga del peso" en distribución de socios: el último socio se
+  lleva el resto exacto para cuadrar a 0 (afecta F1947).
+- Bug GlobalConfig fantasma: calcularIGC(base, utm) ya no crea instancia
+  vacía con tabla IGC hardcodeada; retorna 0 si no hay config válida.
+- Redondeo de resultados finales con Math.round() en ing1600, eg1614 y
+  baseImponible1630 para evitar basura flotante.
+- Precisión flotante en BalanceMiniService.calcularTotales(): utilidad
+  redondeada para evitar valores tipo 0.00000001.
+- Cód. 1614 bug: doble setIvaCredFiscal() en ImportarRCVPanel eliminado.
+
+UI:
+- Validación visual de campos numéricos (InputValidator) — marca en rojo
+  con tooltip si el valor no es numérico o está fuera de rango.
+- Sistema de backup automático y manual (BackupService) con retención
+  de últimos 10 automáticos. Botones en ConfigPanel.
+- Sección "Acerca de" con información del programa, autor y licencia.
+- Bug edición de empresa: campo RUT bloqueado (no modificable), banner
+  amarillo de advertencia en formularios de creación y edición.
+
+LEGAL:
+- Licencia AGPL-3.0 aplicada al proyecto completo. Headers de copyright
+  en todos los archivos .java. Archivo LICENSE en raíz.
+
+
+=================================
+[v0.3.0] — 2026-05  ·  Balance de 8 Columnas
+=================================
+
+NUEVO:
+- Módulo Balance Tributario de 8 columnas (BalanceMiniService +
+  BalancePanel) — independiente del resto del sistema.
+- Persistencia propia en propyme-data/{rut}/balance_{anio}.json,
+  separada del DataStore principal.
+- Lógica de partida doble con todas las cuentas mapeadas correctamente:
+  Activo, Pasivo, Capital, Retiros, Ingreso, Egreso.
+- Cuenta consolidada Banco/Caja que absorbe la contrapartida universal
+  de todos los asientos, asegurando que el balance cuadre.
+- Soporte para CPTS negativo (déficit patrimonial) presentado en el
+  lado del Activo.
+- Filas fijas al cierre: Sumas Parciales, Utilidad/Pérdida del Ejercicio,
+  Sumas Totales.
+- Botones: Completar con datos actuales, Cargar datos guardados,
+  Agregar/Eliminar cuenta, Guardar balance.
+- Indicador visual de cuadre con mensaje explicativo si hay
+  descuadratura.
+
+
+=================================
+[v0.2.0] — 2026-04  ·  Reajuste simplificado
+=================================
+
+CAMBIO DE MODELO:
+- Sistema de reajuste reducido a PPM solamente. PPM Actualizado =
+  PPM Histórico × Factor manual.
+- El resto de los conceptos (Remuneraciones, Honorarios, Arriendos,
+  Gastos, Otros Egresos, Activo Fijo, Compras, Retiros) usan valores
+  históricos directos — comportamiento tributario correcto para 14D N°8.
+
+UI (DatosMensualesPanel):
+- Nueva columna "Factor Reajuste" entre PPM Histórico y PPM Actualizado.
+- Celda editable manualmente; vacía o 0 significa 1.0 (sin reajuste).
+- Verde si valor coincide con auto-llenado de GlobalConfig; amarillo si
+  el usuario lo modificó.
+- Botón "Auto-llenar factores" en barra superior.
+
+MODELO:
+- DatosMes: reemplazados 10 campos mesPago* por un único factorReajustePPM.
+- Ejercicio: eliminado array factoresManuales[13] (no usado).
+
+ARCHIVOS ELIMINADOS:
+- ReajusteDialog.java, ReajusteService.java, ExcelExporter.java,
+  FactoresManualPanel.java.
+
+NOTA: Compatibilidad con JSON de versiones anteriores intencionalmente
+rota — los ejercicios viejos pierden datos de factor y deben reingresarse.
+
+
+=================================
+[v0.1.0] — 2026-04  ·  Primera versión estable interna
+=================================
+
+CORRECCIONES CRÍTICAS:
+- MainFrame: removido ConfigPanel duplicado que causaba comportamiento
+  indefinido del CardLayout y panel Configuración no respondía.
+- MainFrame: agregado repaint() después de revalidate() en initPanels()
+  — paneles aparecían en blanco al cargar empresa.
+- CertificacionPanel: null guard para Resultados antes de llamar
+  distribuirBaseImponible() — prevenía NPE.
+- Recuadro23Panel: null guard para Resultados antes de acceder a campos
+  r.cpts*.
+
+CORRECCIONES MODERADAS:
+- ImportarRCVPanel: después de aplicar al mes, se invalida cache, recarga
+  modelo y recalcula — datos importados se reflejan inmediatamente.
+- HomePanel: al eliminar empresa actualmente abierta se limpia el estado
+  con clearEmpresa() — previene operar sobre datos eliminados.
+
+NUEVO:
+- run.ps1 para Windows con PowerShell — maneja rutas con espacios
+  nativamente.
+- run.bat: siempre recompila, limpia out/ antes de compilar, usa
+  chcp 65001 para UTF-8.
+- ConfigPanel: botón "Guardar Configuración".
+- ConfigPanel: etiqueta de año activo en verde.
+- GlobalConfig: tabla IGC por defecto con valores sentinela ($0-$1, $2-$3)
+  — años no configurados son obviamente inválidos, forzando setup
+  explícito.
+
