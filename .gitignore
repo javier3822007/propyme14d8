@@ -1,0 +1,28 @@
+# Build output
+out/
+build/
+*.class
+*.jar
+
+# IDE
+.idea/
+.vscode/
+*.iml
+.project
+.classpath
+.settings/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Backups del propio editor
+*.bak
+*.swp
+*~
+
+# Datos del usuario (NUNCA subir al repositorio)
+propyme-data/
+
+# Logs
+*.log
