@@ -670,6 +670,9 @@ public class DataStore {
                         i++;
                     }
                 }
+                // FIX: Si el ciclo termina sin encontrar la comilla de cierre
+                // (string malformado), forzar avance de pos para evitar loop infinito.
+                if (i == end) pos = end;
                 items.add(sb.toString());
             } else {
                 pos++;
