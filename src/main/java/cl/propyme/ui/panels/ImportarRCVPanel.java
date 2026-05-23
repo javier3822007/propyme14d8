@@ -295,6 +295,9 @@ public class ImportarRCVPanel extends JPanel {
 
         RCVParser.AggregatedTotals totals = RCVParser.aggregate(registrosCargados, tipo);
 
+        if (frame.getDatosMensualesPanel() != null) {
+            frame.getDatosMensualesPanel().saveToModel();
+        }
         Map<Integer, DatosMes> datos = frame.getDatos();
         DatosMes dm = datos.getOrDefault(mes, new DatosMes(mes));
         dm.setMes(mes);
