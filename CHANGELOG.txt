@@ -10,6 +10,35 @@ Estados:
 
 
 =================================
+[v0.10.0] — 2026-05  ·  Robustez en persistencia y validación de entrada
+=================================
+
+NUEVO:
+- Validador de RUT chileno (RutValidator) con algoritmo Módulo 11.
+  Al crear empresa, si el dígito verificador no coincide, se muestra
+  diálogo de advertencia con opción de continuar (algunos RUTs especiales
+  pueden no cumplir el algoritmo estándar). El RUT no se rechaza
+  automáticamente — la decisión final queda en el usuario.
+- Detector de inconsistencia CSV en RCVParser. Si más del 5% de las
+  líneas tienen un número de columnas anómalo (tolerancia ±3 respecto al
+  header), el ImportarRCVPanel muestra advertencia post-importación con
+  la cantidad y porcentaje de líneas afectadas.
+
+CORRECCIONES DE ROBUSTEZ (DataStore):
+- Validación de archivos JSON al leer: detecta archivos vacíos, con BOM
+  UTF-8, que no empiezan con { o [, que no terminan con el cierre
+  esperado, o con conteo desbalanceado de llaves (truncados a la mitad).
+  Previene que datos faltantes se interpreten silenciosamente como 0.
+- deleteDirectory() ahora acumula los archivos que no pudo eliminar y
+  lanza IOException con la lista completa, en vez de fallar
+  silenciosamente. Evita estado inconsistente al borrar empresas.
+
+CORRECCIONES DE ROBUSTEZ (BackupService):
+- Logging con java.util.logging.Logger en lugar de salida a System.err.
+  Permite configurar nivel de log sin recompilar.
+
+
+=================================
 [v0.9.0] — 2026-05  ·  Primer Release Candidate público
 =================================
 

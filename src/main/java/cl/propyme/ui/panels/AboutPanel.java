@@ -14,7 +14,7 @@ import java.net.URI;
  */
 public class AboutPanel extends JPanel {
 
-    public static final String VERSION = "0.9.0";
+    public static final String VERSION = "0.10.0";
     public static final String AUTOR   = "Javier Ignacio Aguilar G.";
     public static final String EMAIL   = "javier.aguilar382@protonmail.com";
 
