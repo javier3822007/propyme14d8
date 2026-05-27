@@ -74,23 +74,25 @@ public class DatosMensualesPanel extends JPanel {
     private int pendingEgRow = -1;
 
     private static final int
-        E_MES       = 0,
-        E_COMP_AF   = 1,
-        E_NC_COMP   = 2,   // NC Compra (resta egresos)
-        E_ND_COMP   = 3,   // ND Compra (suma egresos)
-        E_IVA_CF    = 4,
-        E_COMP_EX   = 5,
-        E_COMP_NOREC= 6,
-        E_IVA_NOREC = 7,   // calc
-        E_AF        = 8,
-        E_REMUN     = 9,
-        E_HONOR     = 10,
-        E_ARR       = 11,
-        E_GASTOS    = 12,
-        E_OTROS_EG  = 13,
-        E_ADEUD     = 14,
-        E_RET_S1    = 15,
-        E_RET_S2    = 16;
+        E_MES        = 0,
+        E_COMP_AF    = 1,
+        E_NC_COMP    = 2,   // NC Compra (resta egresos)
+        E_ND_COMP    = 3,   // ND Compra (suma egresos)
+        E_IVA_CF     = 4,
+        E_COMP_EX    = 5,
+        E_COMP_NOREC = 6,
+        E_IVA_NOREC  = 7,   // calc
+        E_COMP_BRUTA = 8,   // calc — Compras Af. Netas + IVA CF + ND - NC (simétrico a Venta Bruta)
+        E_AF         = 9,
+        E_REMUN      = 10,
+        E_HONOR      = 11,
+        E_ARR        = 12,
+        E_GASTOS     = 13,
+        E_OTROS_EG   = 14,
+        E_TOT_EGR    = 15,  // calc — Total Egresos del Mes (sin retiros, sin adeudados)
+        E_ADEUD      = 16,
+        E_RET_S1     = 17,
+        E_RET_S2     = 18;
 
     private static final Set<Integer> EG_INPUT = new HashSet<>(Arrays.asList(
         E_COMP_AF, E_NC_COMP, E_ND_COMP, E_IVA_CF, E_COMP_EX, E_COMP_NOREC,
@@ -98,7 +100,7 @@ public class DatosMensualesPanel extends JPanel {
         E_RET_S1, E_RET_S2
     ));
     private static final Set<Integer> EG_CALC = new HashSet<>(Arrays.asList(
-        E_IVA_NOREC
+        E_IVA_NOREC, E_COMP_BRUTA, E_TOT_EGR
     ));
 
     public DatosMensualesPanel(MainFrame frame) {
@@ -171,7 +173,6 @@ public class DatosMensualesPanel extends JPanel {
         setupIngresosListeners();
         initIngresosRows();
         JScrollPane ingScroll = wrapTable(ingTable);
-        ingScroll.setPreferredSize(new Dimension(1130, ingTable.getRowHeight() * 13 + 24));
         tablesPanel.add(ingScroll);
 
         // EGRESOS
@@ -184,7 +185,6 @@ public class DatosMensualesPanel extends JPanel {
         setupEgresosListeners();
         initEgresosRows();
         JScrollPane egScroll = wrapTable(egTable);
-        egScroll.setPreferredSize(new Dimension(1588, egTable.getRowHeight() * 13 + 24));
         tablesPanel.add(egScroll);
 
         // Legend
@@ -235,8 +235,10 @@ public class DatosMensualesPanel extends JPanel {
             "Neto NC\n($)", "Neto ND\n($)",
             "IVA CF\n($)",
             "Compras\nExentas IVA ($)", "Compras IVA\nNo Rec. Neto ($)", "IVA No\nRec. ($)",
+            "Compra\nBruta ($)",
             "Activo\nFijo ($)", "Remuneraciones\n($)", "Honorarios\n($)",
             "Arriendos\n($)", "Gastos\nGenerales ($)", "Otros\nEgresos ($)",
+            "Total Egresos\nMes ($)",
             "Egresos\nAdeudados ($)",
             "Retiro\nSocio 1 ($)", "Retiro\nSocio 2 ($)"
         };
@@ -297,6 +299,15 @@ public class DatosMensualesPanel extends JPanel {
                         setForeground(Theme.TEXT_DARK);
                         setFont(Theme.FONT_BOLD);
                         setHorizontalAlignment(col == mesCol ? LEFT : RIGHT);
+                        if (v != null && col != mesCol && col != pctCol && col != I_FACTOR) {
+                            String s = v.toString().trim();
+                            if (!s.isEmpty() && !s.equals("0")) {
+                                try {
+                                    double d = parseRaw(s);
+                                    if (d != 0) setText(formatNum(d));
+                                } catch (Exception ignored) {}
+                            }
+                        }
                         return this;
                     }
                     if (col == mesCol) {
@@ -379,7 +390,8 @@ public class DatosMensualesPanel extends JPanel {
     }
 
     private void configureEgresosWidths() {
-        int[] w = {88, 115, 95, 105, 120, 95, 95, 115, 100, 100, 110, 100, 110, 110, 110};
+        // Mes, CompAf, NC, ND, IVA CF, CompEx, CompNR, IVA NR, CompBruta, AF, Remun, Honor, Arr, Gastos, OtrosEg, TotEgr
+        int[] w = {88, 115, 95, 105, 120, 95, 95, 115, 110, 100, 100, 110, 100, 110, 110, 115};
         for (int i = 0; i < w.length && i < egTable.getColumnCount(); i++) {
             TableColumn tc = egTable.getColumnModel().getColumn(i);
             tc.setPreferredWidth(w[i]);
@@ -390,12 +402,16 @@ public class DatosMensualesPanel extends JPanel {
     private JScrollPane wrapTable(JTable t) {
         JScrollPane sp = new JScrollPane(t,
             JScrollPane.VERTICAL_SCROLLBAR_NEVER,
-            JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+            JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         sp.setBorder(BorderFactory.createEmptyBorder());
-        // Altura fija: 12 filas de datos + 1 totales + cabecera
-        int h = t.getTableHeader().getPreferredSize().height + t.getRowHeight() * 13 + 4;
-        sp.setPreferredSize(new Dimension(Integer.MAX_VALUE, h));
-        sp.setMaximumSize(new Dimension(Integer.MAX_VALUE, h));
+        // Altura fija: 12 filas de datos + 1 totales + cabecera + reserva para scrollbar horizontal
+        int sbH = ((Integer) javax.swing.UIManager.get("ScrollBar.width", null) != null)
+                ? (Integer) javax.swing.UIManager.get("ScrollBar.width") : 17;
+        int h = t.getTableHeader().getPreferredSize().height + t.getRowHeight() * 13 + 4 + sbH;
+        // Ancho: el real de la tabla (suma de anchos de columna) + 30 px de margen visual a la derecha
+        int w = t.getPreferredSize().width + 30;
+        sp.setPreferredSize(new Dimension(w, h));
+        sp.setMaximumSize(new Dimension(w, h));
         sp.setAlignmentX(LEFT_ALIGNMENT);
         return sp;
     }
@@ -596,8 +612,22 @@ public class DatosMensualesPanel extends JPanel {
             }
             double ivaNoRec = Math.round(compNR * 0.19);
 
-            egModel.setValueAt(fmt(ivaCF),    row, E_IVA_CF);
-            egModel.setValueAt(fmt(ivaNoRec), row, E_IVA_NOREC);
+            // Calcular Compra Bruta (simétrico a Venta Bruta) y Total Egresos del Mes
+            double compBruta = compNetoEfect + ivaCF;
+            double compEx  = parseEG(row, E_COMP_EX);
+            double af      = parseEG(row, E_AF);
+            double remun   = parseEG(row, E_REMUN);
+            double honor   = parseEG(row, E_HONOR);
+            double arr     = parseEG(row, E_ARR);
+            double gastos  = parseEG(row, E_GASTOS);
+            double otrosEg = parseEG(row, E_OTROS_EG);
+            double totEgr  = compNetoEfect + compEx + ivaNoRec
+                           + af + remun + honor + arr + gastos + otrosEg;
+
+            egModel.setValueAt(fmt(ivaCF),     row, E_IVA_CF);
+            egModel.setValueAt(fmt(ivaNoRec),  row, E_IVA_NOREC);
+            egModel.setValueAt(fmt(compBruta), row, E_COMP_BRUTA);
+            egModel.setValueAt(fmt(totEgr),    row, E_TOT_EGR);
         } catch (Exception ex) {
             LOG.log(Level.WARNING, "Error recalculando fila de egresos " + row, ex);
         } finally {
@@ -611,7 +641,10 @@ public class DatosMensualesPanel extends JPanel {
     };
     private static final int[] EG_TOTAL_COLS = {
         E_COMP_AF, E_NC_COMP, E_ND_COMP, E_IVA_CF, E_COMP_EX, E_COMP_NOREC, E_IVA_NOREC,
-        E_AF, E_REMUN, E_HONOR, E_ARR, E_GASTOS, E_OTROS_EG, E_ADEUD, E_RET_S1, E_RET_S2
+        E_COMP_BRUTA,
+        E_AF, E_REMUN, E_HONOR, E_ARR, E_GASTOS, E_OTROS_EG,
+        E_TOT_EGR,
+        E_ADEUD, E_RET_S1, E_RET_S2
     };
 
     private void recalcIngTotals() {
@@ -687,6 +720,7 @@ public class DatosMensualesPanel extends JPanel {
             }
         } finally { updating = false; }
         for (int i = 0; i < 12; i++) recalcIngRow(i, -1);
+        for (int i = 0; i < 12; i++) recalcEgRow(i, -1);
         recalcIngTotals();
         recalcEgTotals();
     }

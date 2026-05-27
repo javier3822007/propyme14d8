@@ -10,6 +10,37 @@ Estados:
 
 
 =================================
+[v0.11.0] — 2026-05  ·  Información ampliada en datos mensuales
+=================================
+
+NUEVO:
+- Columna "Compra Bruta" en tabla de Egresos (calculada): Compras Afectas
+  Netas + IVA CF + ND – NC. Simétrica a "Venta Bruta" de la tabla de
+  Ingresos. Ubicada después de IVA No Rec.
+- Columna "Total Egresos Mes" en tabla de Egresos (calculada): suma
+  Compras + Exentas + IVA No Rec. + Activo Fijo + Remuneraciones +
+  Honorarios + Arriendos + Gastos Generales + Otros Egresos. Excluye
+  retiros de socios y egresos adeudados (que no entran a la base
+  imponible del ejercicio). Ubicada después de Otros Egresos.
+
+MEJORAS DE UI:
+- Scroll horizontal habilitado en tablas de datos mensuales. Antes las
+  columnas a la derecha quedaban cortadas en ventanas chicas.
+- El ancho del scroll pane ahora se calcula dinámicamente desde los
+  anchos de columna (antes hardcodeado a 1130/1588 px, desactualizado).
+  Margen de 30 px a la derecha de la última columna para respiro visual.
+- Fila de totales anuales ahora muestra separadores chilenos
+  (ej: 1.111.111 en lugar de 1111111). Bug pre-existente — el formato
+  ya se aplicaba a las celdas de datos pero no a la fila de totales.
+
+CORRECCIÓN:
+- Al abrir un ejercicio con datos guardados, las columnas calculadas
+  de Egresos (IVA No Rec., y ahora también Compra Bruta y Total Egresos
+  Mes) se llenan automáticamente. Antes solo se llenaban al editar
+  manualmente alguna celda — asimetría latente con tabla de Ingresos.
+
+
+=================================
 [v0.10.0] — 2026-05  ·  Robustez en persistencia y validación de entrada
 =================================
 
