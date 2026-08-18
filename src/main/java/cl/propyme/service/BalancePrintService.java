@@ -70,9 +70,9 @@ public class BalancePrintService {
         job.setJobName("Balance Tributario - " +
             (empresa != null ? empresa.getRazonSocial() : "ProPyme") + " - " + anio);
 
-        // Orientación horizontal (landscape) por defecto
+        // Orientación vertical (portrait) por defecto
         PageFormat pageFormat = job.defaultPage();
-        pageFormat.setOrientation(PageFormat.LANDSCAPE);
+        pageFormat.setOrientation(PageFormat.PORTRAIT);
         Paper paper = pageFormat.getPaper();
         // Márgenes razonables: 1.5cm = ~42 puntos
         double margen = 42;

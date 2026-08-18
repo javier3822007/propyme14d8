@@ -349,6 +349,23 @@ public class HomePanel extends JPanel {
         }
     }
 
+    /**
+     * Si el ejercicio actualmente cargado en el frame tiene cambios sin guardar,
+     * advierte al usuario antes de reemplazarlo por otra empresa/ejercicio.
+     * @return true si se puede continuar (no estaba dirty, o el usuario confirmó descartar).
+     */
+    private boolean checkDirtyBeforeLoad() {
+        if (!frame.isDirty()) return true;
+        int opt = JOptionPane.showConfirmDialog(frame,
+            "Hay cambios sin guardar en la empresa actual.\n" +
+            "Si continúa, los cambios se perderán.\n\n" +
+            "¿Desea continuar sin guardar?",
+            "Cambios sin guardar",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.WARNING_MESSAGE);
+        return opt == JOptionPane.YES_OPTION;
+    }
+
     private void addNewYear() {
         int row = empresaTable.getSelectedRow();
         if (row<0){JOptionPane.showMessageDialog(frame,"Seleccione una empresa."); return;}
@@ -367,7 +384,10 @@ public class HomePanel extends JPanel {
             if (existing.contains(anio)){
                 int opt=JOptionPane.showConfirmDialog(frame,
                     "El ejercicio "+anio+" ya existe. Desea abrirlo?","Ejercicio existente",JOptionPane.YES_NO_OPTION);
-                if(opt==JOptionPane.YES_OPTION) frame.loadEmpresa(emp,anio);
+                if(opt==JOptionPane.YES_OPTION) {
+                    if (!checkDirtyBeforeLoad()) return;
+                    frame.loadEmpresa(emp,anio);
+                }
                 return;
             }
             // Optionally copy antecedentes from previous year
@@ -437,6 +457,7 @@ public class HomePanel extends JPanel {
                 if(sel==null) return;
                 anio=(int)sel;
             }
+            if (!checkDirtyBeforeLoad()) return;
             frame.loadEmpresa(emp,anio);
         } catch(Exception ex){
             JOptionPane.showMessageDialog(frame,"Error: "+ex.getMessage());
