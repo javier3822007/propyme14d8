@@ -23,7 +23,8 @@ echo "Java detectado: versión $JAVA_VER"
 if [ ! -f "$JAR" ]; then
     echo "Compilando fuentes..."
     mkdir -p "$OUT"
-    find "$SCRIPT_DIR/src" -name "*.java" > "$SCRIPT_DIR/sources.txt"
+    # Cada ruta entre comillas: javac separa el archivo @ por espacios
+    find "$SCRIPT_DIR/src" -name "*.java" | sed 's/.*/"&"/' > "$SCRIPT_DIR/sources.txt"
     javac -encoding UTF-8 --release 21 -d "$OUT" @"$SCRIPT_DIR/sources.txt"
     if [ $? -ne 0 ]; then echo "ERROR de compilación"; exit 1; fi
     cat > "$SCRIPT_DIR/MANIFEST.MF" << 'MFEOF'

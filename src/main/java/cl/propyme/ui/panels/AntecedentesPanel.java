@@ -257,7 +257,8 @@ public class AntecedentesPanel extends JPanel {
                 fDivMonto[i].setText(fmt(ej.getDividendoMonto()[i]));
                 fDivCredito[i].setText(fmt(ej.getDividendoCredito()[i]));
             }
-            fFactor33bis.setText(String.format("%.4f", ej.getActivoFijoFactor33bis()));
+            // Locale.ROOT + coma: evita "1.0000" en JVM en_US/C, que parseD leería como 10000
+            fFactor33bis.setText(String.format(java.util.Locale.ROOT, "%.4f", ej.getActivoFijoFactor33bis()).replace(".", ","));
             fUF.setText(fmt(ej.getUfDiciembre()));
             fUTM.setText(fmt(ej.getUtmDiciembre()));
         } finally { loading = false; }

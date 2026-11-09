@@ -231,6 +231,16 @@ public class MainFrame extends JFrame {
 
     // ── Save ─────────────────────────────────────────────────────────────────
 
+    /**
+     * Las tablas de Datos Mensuales y los campos de Antecedentes guardan su
+     * propia copia en pantalla; solo llegan a datosActuales/ejercicioActual
+     * al llamar saveToModel()/saveData(). Debe ejecutarse antes de escribir.
+     */
+    private void sincronizarPanelesAlModelo() {
+        if (datosMensualesPanel != null) datosMensualesPanel.saveToModel();
+        if (antecedentesPanel != null)   antecedentesPanel.saveData();
+    }
+
     public void guardarTodo() {
         if (empresaActual == null || ejercicioActual == null) return;
         // BLOQUEO DE SEGURIDAD: si la última carga falló, no guardar para evitar
@@ -246,6 +256,8 @@ public class MainFrame extends JFrame {
                 "Guardado bloqueado", JOptionPane.WARNING_MESSAGE);
             return;
         }
+        // Copiar lo editado en pantalla al modelo antes de escribir el JSON
+        sincronizarPanelesAlModelo();
         // Desactivar feedback del botón guardar
         javax.swing.JButton saveIndicator = new javax.swing.JButton();
         new javax.swing.SwingWorker<Void, Void>() {
@@ -331,6 +343,7 @@ public class MainFrame extends JFrame {
             // Guardado síncrono (no vía SwingWorker) para que la app no cierre antes de completar la escritura
             try {
                 if (empresaActual != null && ejercicioActual != null) {
+                    sincronizarPanelesAlModelo();
                     store.guardarEmpresa(empresaActual);
                     store.guardarEjercicio(empresaActual.getRut(), ejercicioActual, datosActuales);
                 }

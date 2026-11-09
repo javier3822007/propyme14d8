@@ -10,6 +10,41 @@ Estados:
 
 
 =================================
+[v0.11.1] — 2026-11  ·  Correcciones de guardado e IVA CF
+=================================
+
+CORRECCIONES CRÍTICAS:
+- "Guardar Todo" y el guardado al cerrar ahora copian lo editado en
+  Datos Mensuales y Antecedentes antes de escribir. Antes solo se
+  guardaba lo que ya había pasado por "⟳ Recalcular" (o por Importar
+  RCV); una edición seguida directo de "Guardar Todo" se perdía sin
+  aviso, porque el indicador de cambios pendientes quedaba limpio.
+- El IVA Crédito Fiscal ya no se sobrescribe al abrir un ejercicio ni
+  al editar columnas no relacionadas (Remuneraciones, Honorarios, etc.).
+  Solo se recalcula (neto × 19%) al cambiar Compras Afectas, NC o ND.
+  Se respeta el IVA CF ingresado desde el F29. Regresión introducida
+  en v0.11.0.
+
+OTRAS CORRECCIONES:
+- Aviso de cambios sin guardar al abrir otra empresa o ejercicio.
+- Factor Art. 33 bis se muestra con coma decimal en cualquier
+  configuración regional. En una JVM en inglés aparecía como "1.0000"
+  y al guardar se leía como 10000.
+- Impresión del balance en orientación vertical por defecto.
+- build.sh y run.sh funcionan en carpetas con espacios en la ruta
+  (ej. "CARPETA PARA GIT"). Antes fallaban con "redireccionamiento
+  ambiguo" o con errores de javac.
+
+CONOCIDO / PENDIENTE:
+- Importar RCV: el IVA CF importado incluye el IVA de activo fijo, que
+  también se registra en la columna Activo Fijo. Hasta ahora el bug de
+  sobrescritura del IVA CF lo ocultaba; con esta corrección, los meses
+  importados con activo fijo pueden mostrar el Cód. 1614 aumentado en
+  (IVA AF / 0,19). Ingresando el IVA desde el F29 no ocurre. Pendiente
+  de rediseño del módulo de importación.
+
+
+=================================
 [v0.11.0] — 2026-05  ·  Información ampliada en datos mensuales
 =================================
 

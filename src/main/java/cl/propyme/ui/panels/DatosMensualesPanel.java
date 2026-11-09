@@ -606,7 +606,10 @@ public class DatosMensualesPanel extends JPanel {
 
             if (triggerCol == E_IVA_CF) {
                 if (ivaCF > 0 && compAf == 0) { compAf = Math.round(ivaCF / 0.19); egModel.setValueAt(fmt(compAf), row, E_COMP_AF); compNetoEfect = compAf - ncComp + ndComp; }
-            } else {
+            } else if (triggerCol == E_COMP_AF || triggerCol == E_NC_COMP || triggerCol == E_ND_COMP) {
+                // Solo se recalcula el IVA CF cuando cambia su base (compras, NC, ND).
+                // Editar otras columnas o cargar el ejercicio (triggerCol = -1) respeta
+                // el IVA CF ingresado (fuente de verdad: F29).
                 if (compNetoEfect > 0) ivaCF = Math.round(compNetoEfect * 0.19);
                 else if (compNetoEfect == 0) ivaCF = 0;
             }
