@@ -247,7 +247,7 @@ public class RCVParser {
     }
 
     private static String[] splitCsv(String line) {
-        // FRAGILIDAD CONOCIDA (v1.3.2):
+        // FRAGILIDAD CONOCIDA:
         // El separador se detecta línea por línea con simple contains(";").
         // Edge case: si una línea tiene ambos separadores (ej. una razón social
         // entrecomillada que contiene ";" dentro), siempre gana el ";" sobre el ",".

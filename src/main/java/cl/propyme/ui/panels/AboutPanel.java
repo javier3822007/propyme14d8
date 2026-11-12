@@ -1,3 +1,13 @@
+/*
+ * ProPyme Transparente — Sistema de declaración tributaria 14D N°8
+ * Copyright (C) 2026 Javier Ignacio Aguilar G. <javier.aguilar382@protonmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License v3 as published by the
+ * Free Software Foundation. See the LICENSE file for the full text.
+ *
+ * Distributed WITHOUT ANY WARRANTY. See https://www.gnu.org/licenses/agpl-3.0.html
+ */
 package cl.propyme.ui.panels;
 
 import cl.propyme.ui.MainFrame;
@@ -14,7 +24,7 @@ import java.net.URI;
  */
 public class AboutPanel extends JPanel {
 
-    public static final String VERSION = "0.11.1";
+    public static final String VERSION = "0.11.2";
     public static final String AUTOR   = "Javier Ignacio Aguilar G.";
     public static final String EMAIL   = "javier.aguilar382@protonmail.com";
 

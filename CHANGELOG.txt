@@ -10,6 +10,33 @@ Estados:
 
 
 =================================
+[v0.11.2] — 2026-11  ·  Correcciones menores y aviso de tabla IGC
+=================================
+
+CORRECCIONES:
+- Los botones "⟳ Recalcular" de Recuadro 22, Recuadro 23 y
+  Certificación ahora calculan sobre lo último editado en Datos
+  Mensuales y Antecedentes. Antes mostraban los valores anteriores si
+  no se había presionado el ⟳ de Datos Mensuales.
+- "Total Egresos Mes" ahora incluye el neto de las compras con IVA no
+  recuperable (antes solo sumaba su IVA), igual que el Cód. 1614.
+- Ingreso de montos con decimales: "1.500,50" se interpreta como 1.501
+  (redondeo al peso). Antes los decimales se pegaban a los enteros y el
+  monto quedaba multiplicado por 10 o 100 ("12,5" pasaba a ser 125).
+- Anchos de columna de las tablas de Datos Mensuales: estaban
+  desfasados desde que se agregaron las columnas NC y ND.
+
+MEJORAS:
+- Certificación muestra un aviso visible cuando la tabla IGC del año no
+  ha sido configurada (el IGC calculado en ese caso no es válido).
+
+MANTENCIÓN:
+- sources.txt y MANIFEST.MF salen del repositorio (.gitignore): los
+  genera el build.
+- Encabezado AGPL en AboutPanel y limpieza de comentarios obsoletos.
+
+
+=================================
 [v0.11.1] — 2026-11  ·  Correcciones de guardado e IVA CF
 =================================
 

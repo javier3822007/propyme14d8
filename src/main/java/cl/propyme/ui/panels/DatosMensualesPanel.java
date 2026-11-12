@@ -380,8 +380,8 @@ public class DatosMensualesPanel extends JPanel {
     // ── Column widths ─────────────────────────────────────────────────────────
 
     private void configureIngresosWidths() {
-        // {Mes, VtaAf, IvaDF, VtaBruta, VtaEx, TasaPPM, PPMHist, Factor, PPMAct, OtrosIng, NoPerc}
-        int[] w = {88, 115, 95, 105, 115, 72, 110, 80, 115, 110, 105};
+        // {Mes, VtaAf, NC, ND, IvaDF, VtaBruta, VtaEx, TasaPPM, PPMHist, Factor, PPMAct, OtrosIng, NoPerc}
+        int[] w = {88, 115, 95, 95, 95, 105, 115, 72, 110, 80, 115, 110, 105};
         for (int i = 0; i < w.length && i < ingTable.getColumnCount(); i++) {
             TableColumn tc = ingTable.getColumnModel().getColumn(i);
             tc.setPreferredWidth(w[i]);
@@ -390,8 +390,8 @@ public class DatosMensualesPanel extends JPanel {
     }
 
     private void configureEgresosWidths() {
-        // Mes, CompAf, NC, ND, IVA CF, CompEx, CompNR, IVA NR, CompBruta, AF, Remun, Honor, Arr, Gastos, OtrosEg, TotEgr
-        int[] w = {88, 115, 95, 105, 120, 95, 95, 115, 110, 100, 100, 110, 100, 110, 110, 115};
+        // Mes, CompAf, NC, ND, IVA CF, CompEx, CompNR, IVA NR, CompBruta, AF, Remun, Honor, Arr, Gastos, OtrosEg, TotEgr, Adeud, RetS1, RetS2
+        int[] w = {88, 115, 95, 95, 105, 120, 120, 95, 115, 110, 115, 100, 100, 110, 100, 115, 110, 100, 100};
         for (int i = 0; i < w.length && i < egTable.getColumnCount(); i++) {
             TableColumn tc = egTable.getColumnModel().getColumn(i);
             tc.setPreferredWidth(w[i]);
@@ -624,7 +624,7 @@ public class DatosMensualesPanel extends JPanel {
             double arr     = parseEG(row, E_ARR);
             double gastos  = parseEG(row, E_GASTOS);
             double otrosEg = parseEG(row, E_OTROS_EG);
-            double totEgr  = compNetoEfect + compEx + ivaNoRec
+            double totEgr  = compNetoEfect + compEx + compNR + ivaNoRec
                            + af + remun + honor + arr + gastos + otrosEg;
 
             egModel.setValueAt(fmt(ivaCF),     row, E_IVA_CF);
@@ -812,12 +812,22 @@ public class DatosMensualesPanel extends JPanel {
     private static double parseRaw(String s) {
         if (s == null || s.trim().isEmpty()) return 0;
         s = s.trim().replace("$", "").replace(" ", "");
-        if (s.matches(".*\\.\\d{3}$") || s.matches("\\d{1,3}(\\.\\d{3})+")) {
-            s = s.replace(".", "");
+        int comas = s.length() - s.replace(",", "").length();
+        int puntos = s.length() - s.replace(".", "").length();
+        if (comas == 1) {
+            // Formato chileno: coma decimal, puntos de miles ("1.500,50")
+            s = s.replace(".", "").replace(",", ".");
+        } else if (comas > 1) {
+            // Varias comas: son separadores de miles ("1,500,000")
+            s = s.replace(",", "");
+        } else if (puntos == 1 && !s.matches(".*\\.\\d{3}$")) {
+            // Un solo punto que no separa miles: es decimal ("1500.5")
         } else {
-            s = s.replace(",", ".").replace(".", "");
+            // Puntos de miles ("1.500.000", "1.500")
+            s = s.replace(".", "");
         }
-        try { return Double.parseDouble(s); } catch (Exception e) { return 0; }
+        // Los montos se manejan en pesos enteros: se redondea al peso
+        try { return Math.round(Double.parseDouble(s)); } catch (Exception e) { return 0; }
     }
 
     private static String normalizeInput(String s) {

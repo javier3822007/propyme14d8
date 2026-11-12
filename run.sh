@@ -7,7 +7,7 @@ OUT="$SCRIPT_DIR/out"
 JAR="$SCRIPT_DIR/ProPyme.jar"
 
 echo "============================================"
-echo "  ProPyme Transparente — AT 2026"
+echo "  ProPyme Transparente"
 echo "============================================"
 
 # Check java

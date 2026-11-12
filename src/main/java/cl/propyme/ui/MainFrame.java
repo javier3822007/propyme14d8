@@ -291,6 +291,8 @@ public class MainFrame extends JFrame {
 
     public void recalculate() {
         if (ejercicioActual == null) return;
+        // Todos los botones ⟳ pasan por aquí: calcular siempre sobre lo último editado
+        sincronizarPanelesAlModelo();
         // Run calculation in background, update UI on EDT
         new javax.swing.SwingWorker<cl.propyme.model.Resultados, Void>() {
             protected cl.propyme.model.Resultados doInBackground() {

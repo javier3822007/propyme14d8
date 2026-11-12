@@ -26,3 +26,7 @@ propyme-data/
 
 # Logs
 *.log
+
+# Generados por build.sh / run.sh
+sources.txt
+MANIFEST.MF

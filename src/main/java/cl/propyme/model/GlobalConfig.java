@@ -44,6 +44,8 @@ public class GlobalConfig {
     public double[] getFactores() { return factores; }
     public void setFactores(double[] v) { this.factores = v; }
     public double[][] getIgcTable() { return igcTable; }
+    /** true mientras la tabla IGC conserve los valores sentinela de fábrica. */
+    public boolean isIgcSinConfigurar() { return igcTable[0][1] <= 1; }
     public void setIgcTable(double[][] v) { this.igcTable = v; }
 
     public double calcularIGC(double base) {

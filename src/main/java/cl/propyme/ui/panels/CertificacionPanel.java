@@ -64,6 +64,10 @@ import cl.propyme.ui.Theme;
 
 public class CertificacionPanel extends JPanel {
 
+    private static final String SUBTITULO =
+        "Régimen Art. 14 D N°8 — Distribución a propietarios y cálculo de impuesto";
+    private JLabel subtitulo;
+
     private final MainFrame frame;
     private JTable table;
     private DefaultTableModel model;
@@ -82,8 +86,9 @@ public class CertificacionPanel extends JPanel {
         hdr.setBorder(BorderFactory.createEmptyBorder(14,24,14,24));
         JLabel t = new JLabel("Certificación de Rentas — DJ F1947 y Liquidación IGC");
         t.setFont(Theme.FONT_HEADER); t.setForeground(Color.WHITE);
-        JLabel s = new JLabel("Régimen Art. 14 D N°8 — Distribución a propietarios y cálculo de impuesto");
+        JLabel s = new JLabel(SUBTITULO);
         s.setFont(Theme.FONT_SMALL); s.setForeground(Theme.LIGHT_BLUE);
+        subtitulo = s;
         JPanel tp = new JPanel(new GridLayout(2,1,0,2)); tp.setOpaque(false);
         tp.add(t); tp.add(s);
         hdr.add(tp, BorderLayout.WEST);
@@ -152,6 +157,20 @@ public class CertificacionPanel extends JPanel {
         Ejercicio ej = frame.getEjercicioActual();
         Empresa emp = frame.getEmpresaActual();
         if (ej == null || emp == null) return;
+
+        // Aviso si la tabla IGC sigue con los valores sentinela (el IGC saldría $0)
+        cl.propyme.model.GlobalConfig cfg = frame.getGlobalConfig();
+        if (subtitulo != null) {
+            if (cfg != null && cfg.isIgcSinConfigurar()) {
+                subtitulo.setText("⚠ Tabla IGC no configurada para este año — el IGC mostrado NO es válido. Configure en ⚙ Configuración");
+                subtitulo.setFont(Theme.FONT_BOLD);
+                subtitulo.setForeground(new Color(0xFF, 0xD5, 0x4F));
+            } else {
+                subtitulo.setText(SUBTITULO);
+                subtitulo.setFont(Theme.FONT_SMALL);
+                subtitulo.setForeground(Theme.LIGHT_BLUE);
+            }
+        }
 
         Resultados r = frame.getCachedResultados();
         if (r == null) return;
