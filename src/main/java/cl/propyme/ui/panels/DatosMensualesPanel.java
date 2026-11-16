@@ -265,7 +265,8 @@ public class DatosMensualesPanel extends JPanel {
         t.getTableHeader().setDefaultRenderer(new DefaultTableCellRenderer() {
             public Component getTableCellRendererComponent(JTable tbl, Object v,
                     boolean sel, boolean focus, int row, int col) {
-                JLabel lbl = new JLabel(v == null ? "" : v.toString().replace("\n", " "));
+                // Encabezado en dos líneas (el "\n" del título pasa a <br>) para que no se corte
+                JLabel lbl = new JLabel(v == null ? "" : "<html><center>" + v.toString().replace("\n", "<br>") + "</center></html>");
                 lbl.setFont(Theme.FONT_BOLD);
                 lbl.setForeground(Color.WHITE);
                 lbl.setBackground(Theme.DARK_BLUE);
@@ -386,7 +387,7 @@ public class DatosMensualesPanel extends JPanel {
 
     private void configureIngresosWidths() {
         // {Mes, VtaAf, NC, ND, IvaDF, VtaEx, FcIvaRet, VtaBruta, TasaPPM, PPMHist, Factor, PPMAct, OtrosIng, NoPerc}
-        int[] w = {88, 115, 95, 95, 95, 115, 215, 105, 72, 110, 80, 115, 110, 105};
+        int[] w = {88, 115, 95, 95, 95, 115, 130, 105, 72, 110, 80, 115, 110, 105};
         for (int i = 0; i < w.length && i < ingTable.getColumnCount(); i++) {
             TableColumn tc = ingTable.getColumnModel().getColumn(i);
             tc.setPreferredWidth(w[i]);

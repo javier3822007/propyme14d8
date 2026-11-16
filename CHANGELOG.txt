@@ -10,6 +10,24 @@ Estados:
 
 
 =================================
+[v0.12.1] — 2026-11  ·  Ajustes visuales
+=================================
+
+INTERFAZ:
+- Datos Mensuales: los encabezados de columna se muestran en dos líneas
+  y completos. Antes se cortaban con "…" y algunos no se distinguían
+  entre sí (ej. "Compras Exen…" y "Compras IVA N…").
+- Menú lateral: logo, nombre de la empresa, secciones y botones quedan
+  alineados al borde izquierdo y ocupan todo el ancho. Antes los
+  botones partían desplazados, dejando una franja vacía, y los nombres
+  largos se cortaban ("Recuadro 23 (CP…").
+- La columna "Neto Fact. Compra c/IVA Retenido" vuelve a un ancho
+  normal, ya que su título ahora cabe en dos líneas.
+
+Sin cambios en cálculos ni en el formato de los datos.
+
+
+=================================
 [v0.12.0] — 2026-11  ·  Cód. 1819, facturas de compra c/IVA retenido y Cód. 1607
 =================================
 

@@ -73,6 +73,7 @@ public class SidebarPanel extends JPanel {
         logo.setForeground(Color.WHITE);
         logoPanel.add(logo, BorderLayout.CENTER);
         logoPanel.setMaximumSize(new Dimension(210, 80));
+        logoPanel.setAlignmentX(LEFT_ALIGNMENT);  // misma alineación que los botones (BoxLayout)
         add(logoPanel);
 
         // Empresa info
@@ -81,6 +82,7 @@ public class SidebarPanel extends JPanel {
         empPanel.setBackground(new Color(0x13, 0x1E, 0x36));
         empPanel.setBorder(BorderFactory.createEmptyBorder(10, 14, 10, 14));
         empPanel.setMaximumSize(new Dimension(210, 70));
+        empPanel.setAlignmentX(LEFT_ALIGNMENT);
         empresaLabel = new JLabel("Sin empresa");
         empresaLabel.setFont(new Font("SansSerif", Font.BOLD, 11));
         empresaLabel.setForeground(Theme.SIDEBAR_FG);
@@ -101,6 +103,7 @@ public class SidebarPanel extends JPanel {
                 sep.setForeground(new Color(0x5C, 0x7A, 0x9A));
                 sep.setBorder(BorderFactory.createEmptyBorder(12, 14, 4, 8));
                 sep.setMaximumSize(new Dimension(210, 28));
+                sep.setAlignmentX(LEFT_ALIGNMENT);
                 add(sep);
             } else {
                 JButton btn = createNavButton(item[1], item[0]);
@@ -123,10 +126,11 @@ public class SidebarPanel extends JPanel {
         saveBtn.addActionListener(e -> frame.guardarTodo());
         add(saveBtn);
 
-        JLabel ver = new JLabel("  v0.12.0  •  ProPyme Transparente");
+        JLabel ver = new JLabel("  v0.12.1  •  ProPyme Transparente");
         ver.setFont(new Font("SansSerif", Font.PLAIN, 9));
         ver.setForeground(new Color(0x44,0x55,0x66));
         ver.setMaximumSize(new Dimension(210, 24));
+        ver.setAlignmentX(LEFT_ALIGNMENT);
         add(ver);
         add(Box.createRigidArea(new Dimension(0, 8)));
     }
