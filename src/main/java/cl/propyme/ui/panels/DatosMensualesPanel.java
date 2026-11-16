@@ -43,6 +43,7 @@ public class DatosMensualesPanel extends JPanel {
     private DefaultTableModel ingModel;
     private javax.swing.Timer ingTimer;
     private int pendingIngRow = -1;
+    private int pendingIngCol = -1;
 
     private static final int
         // Ingresos columns
@@ -51,17 +52,18 @@ public class DatosMensualesPanel extends JPanel {
         I_NC_VTA    = 2,   // NC Venta (resta)
         I_ND_VTA    = 3,   // ND Venta (suma)
         I_IVA_DF    = 4,   // IVA Débito
-        I_VTA_BRUTA = 5,   // Venta Bruta (calculado)
-        I_VTA_EX    = 6,   // Ventas/Serv. Exentos
-        I_TASA_PPM  = 7,   // Tasa PPM %
-        I_PPM_HIST  = 8,   // PPM Histórico (calc)
-        I_FACTOR    = 9,   // Factor reajuste manual (input)
-        I_PPM_ACT   = 10,  // PPM Actualizado (calc = hist * factor)
-        I_OTROS_ING = 11,  // Otros Ingresos Percibidos
-        I_NO_PERC   = 12;  // Ingresos No Percibidos
+        I_VTA_EX    = 5,   // Ventas/Serv. Exentos
+        I_FC_IVARET = 6,   // Neto facturas de compra c/IVA retenido (ingreso del giro, sin IVA débito)
+        I_VTA_BRUTA = 7,   // Venta Bruta (calc) — total ventas del giro del mes
+        I_TASA_PPM  = 8,   // Tasa PPM %
+        I_PPM_HIST  = 9,   // PPM Histórico (calc)
+        I_FACTOR    = 10,  // Factor reajuste manual (input)
+        I_PPM_ACT   = 11,  // PPM Actualizado (calc = hist * factor)
+        I_OTROS_ING = 12,  // Otros Ingresos Percibidos (Cód. 1607)
+        I_NO_PERC   = 13;  // Ingresos No Percibidos
 
     private static final Set<Integer> ING_INPUT = new HashSet<>(Arrays.asList(
-        I_VTA_AF, I_NC_VTA, I_ND_VTA, I_IVA_DF, I_VTA_EX, I_TASA_PPM, I_FACTOR, I_OTROS_ING, I_NO_PERC
+        I_VTA_AF, I_NC_VTA, I_ND_VTA, I_IVA_DF, I_VTA_EX, I_FC_IVARET, I_TASA_PPM, I_FACTOR, I_OTROS_ING, I_NO_PERC
     ));
     private static final Set<Integer> ING_CALC = new HashSet<>(Arrays.asList(
         I_VTA_BRUTA, I_PPM_HIST, I_PPM_ACT
@@ -72,6 +74,7 @@ public class DatosMensualesPanel extends JPanel {
     private DefaultTableModel egModel;
     private javax.swing.Timer egTimer;
     private int pendingEgRow = -1;
+    private int pendingEgCol = -1;
 
     private static final int
         E_MES        = 0,
@@ -82,7 +85,7 @@ public class DatosMensualesPanel extends JPanel {
         E_COMP_EX    = 5,
         E_COMP_NOREC = 6,
         E_IVA_NOREC  = 7,   // calc
-        E_COMP_BRUTA = 8,   // calc — Compras Af. Netas + IVA CF + ND - NC (simétrico a Venta Bruta)
+        E_COMP_BRUTA = 8,   // calc — total compras del mes: afectas (±NC/ND) + IVA CF + exentas + no rec. (neto + IVA) + activo fijo
         E_AF         = 9,
         E_REMUN      = 10,
         E_HONOR      = 11,
@@ -214,8 +217,10 @@ public class DatosMensualesPanel extends JPanel {
             "Mes",
             "Ventas Afectas\nNetas ($)",
             "Neto NC\n($)", "Neto ND\n($)",
-            "IVA\nDébito ($)", "Venta\nBruta ($)",
+            "IVA\nDébito ($)",
             "Ventas/Serv.\nExentos IVA ($)",
+            "Neto Fact. Compra\nc/IVA Retenido ($)",
+            "Venta\nBruta ($)",
             "Tasa\nPPM (%)", "PPM\nHistórico ($)", "Factor\nReajuste", "PPM\nActualizado ($)",
             "Otros Ing.\nPercibidos ($)", "Ing. No\nPercibidos ($)"
         };
@@ -299,7 +304,7 @@ public class DatosMensualesPanel extends JPanel {
                         setForeground(Theme.TEXT_DARK);
                         setFont(Theme.FONT_BOLD);
                         setHorizontalAlignment(col == mesCol ? LEFT : RIGHT);
-                        if (v != null && col != mesCol && col != pctCol && col != I_FACTOR) {
+                        if (v != null && col != mesCol && col != pctCol && !(pctCol >= 0 && col == I_FACTOR)) {
                             String s = v.toString().trim();
                             if (!s.isEmpty() && !s.equals("0")) {
                                 try {
@@ -340,7 +345,7 @@ public class DatosMensualesPanel extends JPanel {
                         setForeground(Theme.TEXT_DARK);
                     }
                 }
-                if (v != null && col != mesCol && col != pctCol && col != I_FACTOR) {
+                if (v != null && col != mesCol && col != pctCol && !(pctCol >= 0 && col == I_FACTOR)) {
                     String s = v.toString().trim();
                     if (!s.isEmpty() && !s.equals("0")) {
                         try {
@@ -380,8 +385,8 @@ public class DatosMensualesPanel extends JPanel {
     // ── Column widths ─────────────────────────────────────────────────────────
 
     private void configureIngresosWidths() {
-        // {Mes, VtaAf, NC, ND, IvaDF, VtaBruta, VtaEx, TasaPPM, PPMHist, Factor, PPMAct, OtrosIng, NoPerc}
-        int[] w = {88, 115, 95, 95, 95, 105, 115, 72, 110, 80, 115, 110, 105};
+        // {Mes, VtaAf, NC, ND, IvaDF, VtaEx, FcIvaRet, VtaBruta, TasaPPM, PPMHist, Factor, PPMAct, OtrosIng, NoPerc}
+        int[] w = {88, 115, 95, 95, 95, 115, 215, 105, 72, 110, 80, 115, 110, 105};
         for (int i = 0; i < w.length && i < ingTable.getColumnCount(); i++) {
             TableColumn tc = ingTable.getColumnModel().getColumn(i);
             tc.setPreferredWidth(w[i]);
@@ -487,10 +492,14 @@ public class DatosMensualesPanel extends JPanel {
                 int row = e.getFirstRow(); int col = e.getColumn();
                 if (row < 0 || col == I_MES || ING_CALC.contains(col)) return;
                 frame.markDirty();
-                pendingIngRow = row;
+                // Si hay otra edición pendiente, recalcularla ahora con su propia fila/columna
+                if (pendingIngRow >= 0 && (pendingIngRow != row || pendingIngCol != col)) {
+                    recalcIngRow(pendingIngRow, pendingIngCol);
+                }
+                pendingIngRow = row; pendingIngCol = col;
                 if (ingTimer != null && ingTimer.isRunning()) { ingTimer.restart(); return; }
                 ingTimer = new javax.swing.Timer(300, ev -> {
-                    if (pendingIngRow >= 0) { recalcIngRow(pendingIngRow, col); pendingIngRow = -1; }
+                    if (pendingIngRow >= 0) { recalcIngRow(pendingIngRow, pendingIngCol); pendingIngRow = -1; }
                 });
                 ingTimer.setRepeats(false); ingTimer.start();
             }
@@ -504,10 +513,14 @@ public class DatosMensualesPanel extends JPanel {
                 int row = e.getFirstRow(); int col = e.getColumn();
                 if (row < 0 || col == E_MES || EG_CALC.contains(col)) return;
                 frame.markDirty();
-                pendingEgRow = row;
+                // Si hay otra edición pendiente, recalcularla ahora con su propia fila/columna
+                if (pendingEgRow >= 0 && (pendingEgRow != row || pendingEgCol != col)) {
+                    recalcEgRow(pendingEgRow, pendingEgCol);
+                }
+                pendingEgRow = row; pendingEgCol = col;
                 if (egTimer != null && egTimer.isRunning()) { egTimer.restart(); return; }
                 egTimer = new javax.swing.Timer(300, ev -> {
-                    if (pendingEgRow >= 0) { recalcEgRow(pendingEgRow, col); pendingEgRow = -1; }
+                    if (pendingEgRow >= 0) { recalcEgRow(pendingEgRow, pendingEgCol); pendingEgRow = -1; }
                 });
                 egTimer.setRepeats(false); egTimer.start();
             }
@@ -555,6 +568,7 @@ public class DatosMensualesPanel extends JPanel {
             double ndVta  = parseIG(row, I_ND_VTA);
             double ivaDF  = parseIG(row, I_IVA_DF);
             double vtaEx  = parseIG(row, I_VTA_EX);
+            double fcRet  = parseIG(row, I_FC_IVARET);
             double otros  = parseIG(row, I_OTROS_ING);
 
             // Neto efectivo afecto a IVA (ventas afectas ajustadas por notas)
@@ -568,10 +582,11 @@ public class DatosMensualesPanel extends JPanel {
             } else {
                 if (ivaDF == 0 && netoEfectivo > 0) ivaDF = Math.round(netoEfectivo * 0.19);
             }
-            double vtaBruta = netoEfectivo + ivaDF;
+            // Venta Bruta = total de ventas del giro del mes (las de IVA retenido suman solo el neto)
+            double vtaBruta = netoEfectivo + ivaDF + vtaEx + fcRet;
             double tasa = parsePctIG(row);
-            // Base PPM ajustada por NC (resta) y ND (suma)
-            double basePPM = netoEfectivo + vtaEx + otros;
+            // Base PPM: todos los ingresos netos, ajustada por NC (resta) y ND (suma)
+            double basePPM = netoEfectivo + vtaEx + fcRet + otros;
             double ppmHist = Math.round(basePPM * tasa);
 
             // Factor manual: si vacío → 1.0 (sin reajuste). PPM Actualizado = PPM Hist × Factor.
@@ -615,10 +630,10 @@ public class DatosMensualesPanel extends JPanel {
             }
             double ivaNoRec = Math.round(compNR * 0.19);
 
-            // Calcular Compra Bruta (simétrico a Venta Bruta) y Total Egresos del Mes
-            double compBruta = compNetoEfect + ivaCF;
+            // Compra Bruta = total de compras del mes (simétrico a Venta Bruta), incluye activo fijo
             double compEx  = parseEG(row, E_COMP_EX);
             double af      = parseEG(row, E_AF);
+            double compBruta = compNetoEfect + ivaCF + compEx + compNR + ivaNoRec + af;
             double remun   = parseEG(row, E_REMUN);
             double honor   = parseEG(row, E_HONOR);
             double arr     = parseEG(row, E_ARR);
@@ -640,7 +655,7 @@ public class DatosMensualesPanel extends JPanel {
     }
 
     private static final int[] ING_TOTAL_COLS = {
-        I_VTA_AF, I_NC_VTA, I_ND_VTA, I_IVA_DF, I_VTA_BRUTA, I_VTA_EX, I_PPM_HIST, I_PPM_ACT, I_OTROS_ING, I_NO_PERC
+        I_VTA_AF, I_NC_VTA, I_ND_VTA, I_IVA_DF, I_VTA_EX, I_FC_IVARET, I_VTA_BRUTA, I_PPM_HIST, I_PPM_ACT, I_OTROS_ING, I_NO_PERC
     };
     private static final int[] EG_TOTAL_COLS = {
         E_COMP_AF, E_NC_COMP, E_ND_COMP, E_IVA_CF, E_COMP_EX, E_COMP_NOREC, E_IVA_NOREC,
@@ -683,7 +698,6 @@ public class DatosMensualesPanel extends JPanel {
                 DatosMes dm = datos.getOrDefault(i + 1, new DatosMes(i + 1));
                 double ivaDF   = dm.getIvaDebito() > 0 ? dm.getIvaDebito() : Math.round(dm.getVentasAfectasNetas() * 0.19);
                 double ivaCF   = dm.getIvaCredFiscal() > 0 ? dm.getIvaCredFiscal() : Math.round(dm.getComprasAfectasNetas() * 0.19);
-                double vtaBruta= dm.getVentasAfectasNetas() + ivaDF;
                 double ivaNoRec= dm.getIvaNoRecuperable();
 
                 // Ingresos
@@ -692,8 +706,8 @@ public class DatosMensualesPanel extends JPanel {
                 ingModel.setValueAt(fmt(dm.getNotasCreditoVenta()),         i, I_NC_VTA);
                 ingModel.setValueAt(fmt(dm.getNotasDebitoVenta()),          i, I_ND_VTA);
                 ingModel.setValueAt(fmt(ivaDF),                            i, I_IVA_DF);
-                ingModel.setValueAt(fmt(vtaBruta),                         i, I_VTA_BRUTA);
                 ingModel.setValueAt(fmt(dm.getVentasExentasIVA()),          i, I_VTA_EX);
+                ingModel.setValueAt(fmt(dm.getNetoFactCompraIvaRetenido()), i, I_FC_IVARET);
                 ingModel.setValueAt(fmtPct(dm.getTasaPPM()),               i, I_TASA_PPM);
                 ingModel.setValueAt(fmt(dm.getPPMHistorico()),              i, I_PPM_HIST);
                 double f = dm.getFactorReajustePPM();
@@ -741,6 +755,7 @@ public class DatosMensualesPanel extends JPanel {
             dm.setNotasDebitoVenta(parseIG(i, I_ND_VTA));
             dm.setIvaDebito(parseIG(i, I_IVA_DF));
             dm.setVentasExentasIVA(parseIG(i, I_VTA_EX));
+            dm.setNetoFactCompraIvaRetenido(parseIG(i, I_FC_IVARET));
             dm.setTasaPPM(parsePctIG(i));
             dm.setOtrosIngresosPercibidos(parseIG(i, I_OTROS_ING));
             dm.setIngresosNoPercibidos(parseIG(i, I_NO_PERC));
@@ -798,7 +813,7 @@ public class DatosMensualesPanel extends JPanel {
 
     private static String formatNum(double v) {
         if (v == 0) return "0";
-        NumberFormat nf = NumberFormat.getIntegerInstance(new Locale("es", "CL"));
+        NumberFormat nf = NumberFormat.getIntegerInstance(Locale.forLanguageTag("es-CL"));
         nf.setGroupingUsed(true);
         return nf.format(Math.round(v));
     }

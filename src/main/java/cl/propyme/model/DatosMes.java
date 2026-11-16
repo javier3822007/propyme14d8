@@ -28,6 +28,9 @@ public class DatosMes {
     private double ventasExentasIVA;
     private double ivaDebito;
     private double otrosIngresosPercibidos;
+    // Neto de facturas de compra recibidas con IVA retenido total (cambio de sujeto):
+    // ingreso del giro (Cód. 1600) que no genera IVA débito
+    private double netoFactCompraIvaRetenido;
     private double ingresosNoPercibidos; // monto devengado no cobrado
 
     // PPM
@@ -66,7 +69,7 @@ public class DatosMes {
     // Esto aplica tanto en ventas (afecta PPM e ingresos) como en compras (afecta egresos).
     public double getBasePPM() {
         return ventasAfectasNetas - notasCreditoVenta + notasDebitoVenta
-             + ventasExentasIVA + otrosIngresosPercibidos;
+             + ventasExentasIVA + netoFactCompraIvaRetenido + otrosIngresosPercibidos;
     }
 
     public double getPPMHistorico() {
@@ -99,7 +102,7 @@ public class DatosMes {
     }
 
     public double getTotalPercibido() {
-        return getPercibidoAfecto() + ventasExentasIVA + otrosIngresosPercibidos;
+        return getPercibidoAfecto() + ventasExentasIVA + netoFactCompraIvaRetenido + otrosIngresosPercibidos;
     }
 
     public double getTotalRetirosHistorico() {
@@ -121,6 +124,8 @@ public class DatosMes {
     public void setIvaDebito(double v) { this.ivaDebito = v; }
     public double getOtrosIngresosPercibidos() { return otrosIngresosPercibidos; }
     public void setOtrosIngresosPercibidos(double v) { this.otrosIngresosPercibidos = v; }
+    public double getNetoFactCompraIvaRetenido() { return netoFactCompraIvaRetenido; }
+    public void setNetoFactCompraIvaRetenido(double v) { this.netoFactCompraIvaRetenido = v; }
     public double getIngresosNoPercibidos() { return ingresosNoPercibidos; }
     public void setIngresosNoPercibidos(double v) { this.ingresosNoPercibidos = v; }
     public double getTasaPPM() { return tasaPPM; }

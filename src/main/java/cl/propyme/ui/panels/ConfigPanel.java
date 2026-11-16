@@ -304,7 +304,7 @@ public class ConfigPanel extends JPanel {
             }
             // IGC table
             double[][] igc = currentConfig.getIgcTable();
-            NumberFormat nf = NumberFormat.getIntegerInstance(new Locale("es","CL"));
+            NumberFormat nf = NumberFormat.getIntegerInstance(Locale.forLanguageTag("es-CL"));
             for (int i=0;i<8&&i<igc.length;i++) {
                 igcDesde[i].setText(nf.format(Math.round(igc[i][0])));
                 igcHasta[i].setText(i==7 ? "y más" : nf.format(Math.round(igc[i][1])));

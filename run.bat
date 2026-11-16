@@ -3,7 +3,7 @@ REM ProPyme - Script de compilacion y ejecucion para Windows
 REM Requiere JDK 21+ en el PATH
 
 echo ============================================
-echo   Sistema ProPyme Transparente v0.11.2
+echo   Sistema ProPyme Transparente v0.12.0
 echo ============================================
 
 where javac >nul 2>&1

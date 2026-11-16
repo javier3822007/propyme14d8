@@ -27,7 +27,7 @@ public class CalculadorImpuesto {
     public static Resultados calcular(Ejercicio ej, Map<Integer,DatosMes> meses, GlobalConfig cfg) {
         Resultados r = new Resultados();
 
-        double totVtaAfectas=0,totVtaExentas=0,totOtrosIng=0,totNoPercibido=0;
+        double totVtaAfectas=0,totVtaExentas=0,totVtaIvaRet=0,totOtrosIng=0,totNoPercibido=0;
         double totIvaDF=0,totIvaCF=0,totIvaNoRec=0;
         double totComp=0,totCompExentas=0,totCompNoRecNeto=0;
         double totAF=0,totRemun=0,totHonor=0,totArr=0;
@@ -42,6 +42,7 @@ public class CalculadorImpuesto {
                             - dm.getNotasCreditoVenta()
                             + dm.getNotasDebitoVenta();
             totVtaExentas  += dm.getVentasExentasIVA();
+            totVtaIvaRet   += dm.getNetoFactCompraIvaRetenido();
             totOtrosIng    += dm.getOtrosIngresosPercibidos();
             totNoPercibido += dm.getIngresosNoPercibidos();
             totIvaDF       += dm.getIvaDebito();
@@ -104,13 +105,15 @@ public class CalculadorImpuesto {
 
         // ── RECUADRO 22 ───────────────────────────────────────────────────────
         double percibidoAfecto = totVtaAfectas - totNoPercibido;
-        r.ing1600 = Math.round(percibidoAfecto + totVtaExentas + totOtrosIng);
-        r.ing1819 = 0;
+        // 1600: ingresos del giro (afectos percibidos + exentos + facturas de compra c/IVA retenido)
+        r.ing1600 = Math.round(percibidoAfecto + totVtaExentas + totVtaIvaRet);
+        r.ing1819 = Math.round(ej.getIngresosDevengadosAnteriores());
         r.ing1601 = 0; r.ing1602 = 0; r.ing1603 = 0;
         r.ing1604 = totalDivMonto;
         r.ing1605 = totalDivCredito;
         r.ing1606 = 0;
-        r.ing1607 = r.reajustePPM;
+        // 1607: otros ingresos percibidos + reajuste PPM
+        r.ing1607 = Math.round(totOtrosIng) + r.reajustePPM;
         r.ing1608 = r.ingresoDiferidoImputado;
         r.ing1609 = r.credito33bis;
 

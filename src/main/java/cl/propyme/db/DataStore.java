@@ -301,6 +301,7 @@ public class DataStore {
         sb.append("  \"cptsNegativoInicial\":").append(ej.getCptsNegativoInicial()).append(",\n");
         sb.append("  \"perdidaAnterior\":").append(ej.getPerdidaAnterior()).append(",\n");
         sb.append("  \"existenciasAdeudadas\":").append(ej.getExistenciasAdeudadasAnteriores()).append(",\n");
+        sb.append("  \"ingresosDevengadosAnteriores\":").append(ej.getIngresosDevengadosAnteriores()).append(",\n");
         sb.append("  \"capitalInicial\":").append(ej.getCapitalInicial()).append(",\n");
         sb.append("  \"saldoIngresoDiferido\":").append(ej.getSaldoIngresoDiferido()).append(",\n");
         sb.append("  \"activoFijoFactor33bis\":").append(ej.getActivoFijoFactor33bis()).append(",\n");
@@ -341,6 +342,7 @@ public class DataStore {
             ",\"vtaExentas\":" + safeDouble(dm.getVentasExentasIVA()) +
             ",\"ivaDebito\":" + safeDouble(dm.getIvaDebito()) +
             ",\"otrosIng\":" + safeDouble(dm.getOtrosIngresosPercibidos()) +
+            ",\"netoFcIvaRet\":" + safeDouble(dm.getNetoFactCompraIvaRetenido()) +
             ",\"noPercibido\":" + safeDouble(dm.getIngresosNoPercibidos()) +
             ",\"tasaPPM\":" + safeDouble(dm.getTasaPPM()) +
             ",\"compAfectas\":" + safeDouble(dm.getComprasAfectasNetas()) +
@@ -371,6 +373,8 @@ public class DataStore {
         ej.setCptsNegativoInicial(jdouble(json, "cptsNegativoInicial"));
         ej.setPerdidaAnterior(jdouble(json, "perdidaAnterior"));
         ej.setExistenciasAdeudadasAnteriores(jdouble(json, "existenciasAdeudadas"));
+        // Ausente en ejercicios guardados antes de v0.12.0: jdouble devuelve 0
+        ej.setIngresosDevengadosAnteriores(jdouble(json, "ingresosDevengadosAnteriores"));
         ej.setCapitalInicial(jdouble(json, "capitalInicial"));
         ej.setSaldoIngresoDiferido(jdouble(json, "saldoIngresoDiferido"));
         ej.setActivoFijoFactor33bis(jdouble(json, "activoFijoFactor33bis"));
@@ -403,6 +407,8 @@ public class DataStore {
                             mes.setVentasExentasIVA(jdouble(obj, "vtaExentas"));
                             mes.setIvaDebito(jdouble(obj, "ivaDebito"));
                             mes.setOtrosIngresosPercibidos(jdouble(obj, "otrosIng"));
+                            // Ausente en datos anteriores a v0.12.0: jdouble devuelve 0
+                            mes.setNetoFactCompraIvaRetenido(jdouble(obj, "netoFcIvaRet"));
                             mes.setIngresosNoPercibidos(jdouble(obj, "noPercibido"));
                             mes.setTasaPPM(jdouble(obj, "tasaPPM"));
                             mes.setComprasAfectasNetas(jdouble(obj, "compAfectas"));

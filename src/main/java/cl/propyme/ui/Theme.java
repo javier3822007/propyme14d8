@@ -69,9 +69,9 @@ public class Theme {
     public static final NumberFormat PESO_FMT;
     public static final NumberFormat PCT_FMT;
     static {
-        PESO_FMT = NumberFormat.getIntegerInstance(new Locale("es","CL"));
+        PESO_FMT = NumberFormat.getIntegerInstance(Locale.forLanguageTag("es-CL"));
         PESO_FMT.setGroupingUsed(true);
-        PCT_FMT = NumberFormat.getPercentInstance(new Locale("es","CL"));
+        PCT_FMT = NumberFormat.getPercentInstance(Locale.forLanguageTag("es-CL"));
         PCT_FMT.setMinimumFractionDigits(3);
         PCT_FMT.setMaximumFractionDigits(3);
     }

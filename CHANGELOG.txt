@@ -10,6 +10,49 @@ Estados:
 
 
 =================================
+[v0.12.0] — 2026-11  ·  Cód. 1819, facturas de compra c/IVA retenido y Cód. 1607
+=================================
+
+NUEVO:
+- Antecedentes: campo "Ingresos devengados ejerc. ant., percibidos este
+  año (Cód. 1819)". Alimenta el Cód. 1819 del Recuadro 22, que antes
+  estaba fijo en cero.
+- Datos Mensuales (Ingresos): columna "Neto Fact. Compra c/IVA
+  Retenido". Para ventas en que el comprador emite factura de compra y
+  retiene el total del IVA (cambio de sujeto). Suma al Cód. 1600 y a la
+  base del PPM; no genera IVA débito.
+
+CAMBIOS DE CRITERIO:
+- "Otros Ing. Percibidos" ahora alimenta el Cód. 1607 (junto con el
+  reajuste del PPM). Antes se sumaba al Cód. 1600. El total de ingresos
+  (Cód. 1610) y la base imponible no cambian; cambia el desglose entre
+  1600 y 1607. Sigue formando parte de la base del PPM.
+  ATENCIÓN: en ejercicios ya declarados que tengan montos en esa
+  columna, los Cód. 1600 y 1607 se mostrarán distintos a lo declarado.
+  Si se usaba "Otros Ing. Percibidos" para anotar ventas con IVA
+  retenido, hay que mover esos montos a la columna nueva.
+- "Venta Bruta" = total de ventas del giro del mes: afectas (−NC +ND)
+  + IVA débito + exentas + neto de facturas de compra c/IVA retenido.
+  La columna se reubicó a la derecha de estas. Es solo informativa.
+- "Compra Bruta" = total de compras del mes: afectas (−NC +ND) + IVA CF
+  + exentas + compras con IVA no recuperable (neto e IVA) + activo
+  fijo. Es solo informativa.
+
+CORRECCIONES:
+- Ediciones muy seguidas (menos de 300 ms) en Datos Mensuales: cada una
+  se recalcula con su propia fila y columna. Antes la segunda podía
+  dejar sin actualizar el IVA sugerido o la fila anterior.
+- La columna Activo Fijo se mostraba sin separador de miles.
+
+MANTENCIÓN:
+- Reemplazo de un constructor de Locale obsoleto (sin cambio visible).
+
+COMPATIBILIDAD:
+- Los ejercicios guardados con versiones anteriores se abren sin
+  cambios; los campos nuevos parten en 0.
+
+
+=================================
 [v0.11.2] — 2026-11  ·  Correcciones menores y aviso de tabla IGC
 =================================
 

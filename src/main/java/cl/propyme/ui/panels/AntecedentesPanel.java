@@ -63,7 +63,7 @@ public class AntecedentesPanel extends JPanel {
     private final MainFrame frame;
 
     // Año anterior
-    private JTextField fCptsPos, fCptsNeg, fPerdida, fExistAnt, fCapInicial;
+    private JTextField fCptsPos, fCptsNeg, fPerdida, fIngDevAnt, fExistAnt, fCapInicial;
     // Ingreso diferido
     private JTextField fIdSaldo;
     // Dividendos (5)
@@ -94,7 +94,7 @@ public class AntecedentesPanel extends JPanel {
             public void changedUpdate(javax.swing.event.DocumentEvent e) { onChange(); }
             private void onChange() { if (!loading) frame.markDirty(); }
         };
-        JTextField[] all = { fCptsPos, fCptsNeg, fPerdida, fExistAnt, fCapInicial, fIdSaldo,
+        JTextField[] all = { fCptsPos, fCptsNeg, fPerdida, fIngDevAnt, fExistAnt, fCapInicial, fIdSaldo,
                              fFactor33bis, fUF, fUTM };
         for (JTextField f : all) if (f != null) f.getDocument().addDocumentListener(dl);
         for (JTextField f : fDivDetalle) if (f != null) f.getDocument().addDocumentListener(dl);
@@ -152,6 +152,8 @@ public class AntecedentesPanel extends JPanel {
                            "Ingresar si aplica (en positivo)");
         fPerdida  = addRow(p1, "Pérdida tributaria año anterior (Cód. 1627):", "0",
                            "Desde Recuadro 22 del AT anterior");
+        fIngDevAnt = addRow(p1, "Ingresos devengados ejerc. ant., percibidos este año (Cód. 1819):", "0",
+                           "Ventas de años anteriores cobradas en este ejercicio");
         fExistAnt = addRow(p1, "Existencias adeudadas ejerc. ant., pagadas este año (Cód. 1820):", "0",
                            "Deudas de compras del año anterior pagadas en este ejercicio");
         fCapInicial = addRow(p1, "Capital aportado inicio actividades (Cód. 1573):", "0",
@@ -249,6 +251,7 @@ public class AntecedentesPanel extends JPanel {
             fCptsPos.setText(fmt(ej.getCptsPositivoInicial()));
             fCptsNeg.setText(fmt(ej.getCptsNegativoInicial()));
             fPerdida.setText(fmt(ej.getPerdidaAnterior()));
+            fIngDevAnt.setText(fmt(ej.getIngresosDevengadosAnteriores()));
             fExistAnt.setText(fmt(ej.getExistenciasAdeudadasAnteriores()));
             fCapInicial.setText(fmt(ej.getCapitalInicial()));
             fIdSaldo.setText(fmt(ej.getSaldoIngresoDiferido()));
@@ -270,6 +273,7 @@ public class AntecedentesPanel extends JPanel {
         ej.setCptsPositivoInicial(parseD(fCptsPos));
         ej.setCptsNegativoInicial(parseD(fCptsNeg));
         ej.setPerdidaAnterior(parseD(fPerdida));
+        ej.setIngresosDevengadosAnteriores(parseD(fIngDevAnt));
         ej.setExistenciasAdeudadasAnteriores(parseD(fExistAnt));
         ej.setCapitalInicial(parseD(fCapInicial));
         ej.setSaldoIngresoDiferido(parseD(fIdSaldo));
@@ -333,7 +337,7 @@ public class AntecedentesPanel extends JPanel {
 
     private String fmt(double v) {
         if (v==0) return "0";
-        java.text.NumberFormat nf = java.text.NumberFormat.getIntegerInstance(new java.util.Locale("es","CL"));
+        java.text.NumberFormat nf = java.text.NumberFormat.getIntegerInstance(java.util.Locale.forLanguageTag("es-CL"));
         return nf.format(Math.round(v));
     }
     private double parseD(JTextField f) {

@@ -17,6 +17,8 @@ public class Ejercicio {
     private double cptsNegativoInicial;
     private double perdidaAnterior;
     private double existenciasAdeudadasAnteriores;
+    // Ingresos devengados en ejercicios anteriores, percibidos este año (Cód. 1819)
+    private double ingresosDevengadosAnteriores;
     // Capital aportado para empresas que inician actividades (Cód. 1573)
     private double capitalInicial;
     // Ingreso diferido
@@ -54,6 +56,8 @@ public class Ejercicio {
     public void setPerdidaAnterior(double v) { this.perdidaAnterior = v; }
     public double getExistenciasAdeudadasAnteriores() { return existenciasAdeudadasAnteriores; }
     public void setExistenciasAdeudadasAnteriores(double v) { this.existenciasAdeudadasAnteriores = v; }
+    public double getIngresosDevengadosAnteriores() { return ingresosDevengadosAnteriores; }
+    public void setIngresosDevengadosAnteriores(double v) { this.ingresosDevengadosAnteriores = v; }
     public double getCapitalInicial() { return capitalInicial; }
     public void setCapitalInicial(double v) { this.capitalInicial = v; }
     public double getSaldoIngresoDiferido() { return saldoIngresoDiferido; }

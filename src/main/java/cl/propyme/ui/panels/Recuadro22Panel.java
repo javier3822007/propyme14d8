@@ -191,7 +191,7 @@ public class Recuadro22Panel extends JPanel {
         model.setRowCount(0);
 
         addSect("INGRESOS DEL EJERCICIO");
-        addRow("(+)","1600","Ingresos del giro percibidos (afectos + exentos IVA)", r.ing1600);
+        addRow("(+)","1600","Ingresos del giro percibidos (afectos + exentos + fact. compra c/IVA retenido)", r.ing1600);
         addRow("(+)","1819","Ingresos devengados ejercicios anteriores, percibidos este año", r.ing1819);
         addRow("(+)","1601","Rentas de fuente extranjera percibidas", r.ing1601);
         addRow("(+)","1602","Intereses y reajustes percibidos", r.ing1602);
