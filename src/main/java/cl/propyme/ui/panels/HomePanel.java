@@ -243,11 +243,11 @@ public class HomePanel extends JPanel {
                 fGiro.getText().trim(),fDom.getText().trim());
             List<Socio> socios = new ArrayList<>();
             if (!fS1n.getText().trim().isEmpty()) {
-                double p=Double.parseDouble(fS1p.getText().trim().replace(",",".").replace("%",""))/100;
+                double p=parsePct(fS1p);
                 socios.add(new Socio(fS1r.getText().trim(),fS1n.getText().trim(),p,parseD(fS1c),1));
             }
             if (!fS2n.getText().trim().isEmpty()) {
-                double p=Double.parseDouble(fS2p.getText().trim().replace(",",".").replace("%",""))/100;
+                double p=parsePct(fS2p);
                 socios.add(new Socio(fS2r.getText().trim(),fS2n.getText().trim(),p,parseD(fS2c),2));
             }
             emp.setSocios(socios);
@@ -302,11 +302,13 @@ public class HomePanel extends JPanel {
             Socio s2=emp.getSocios().size()>1?emp.getSocios().get(1):new Socio();
             JTextField fS1n=Theme.inputField(s1.getNombre()!=null?s1.getNombre():"");
             JTextField fS1r=Theme.inputField(s1.getRut()!=null?s1.getRut():"");
-            JTextField fS1p=Theme.inputField(String.format("%.1f",s1.getPorcentaje()*100));
+            JTextField fS1p=Theme.inputField(fmtPct(s1.getPorcentaje()));
+            final String pctOrig1=fS1p.getText();
             JTextField fS1c=Theme.inputField(String.valueOf(Math.round(s1.getCapitalAportado())));
             JTextField fS2n=Theme.inputField(s2.getNombre()!=null?s2.getNombre():"");
             JTextField fS2r=Theme.inputField(s2.getRut()!=null?s2.getRut():"");
-            JTextField fS2p=Theme.inputField(String.format("%.1f",s2.getPorcentaje()*100));
+            JTextField fS2p=Theme.inputField(fmtPct(s2.getPorcentaje()));
+            final String pctOrig2=fS2p.getText();
             JTextField fS2c=Theme.inputField(String.valueOf(Math.round(s2.getCapitalAportado())));
 
             JPanel form = buildForm(fRut,fNom,fGiro,fDom,null,fS1n,fS1r,fS1p,fS1c,fS2n,fS2r,fS2p,fS2c);
@@ -325,11 +327,15 @@ public class HomePanel extends JPanel {
                     emp.setDomicilio(fDom.getText().trim());
                     List<Socio> socios=new ArrayList<>();
                     if(!fS1n.getText().trim().isEmpty()){
-                        double p=Double.parseDouble(fS1p.getText().trim().replace(",",".").replace("%",""))/100;
+                        // Si el % no se tocó, se conserva el valor guardado tal cual
+                        // (el texto en pantalla puede estar redondeado a 6 decimales).
+                        double p=fS1p.getText().equals(pctOrig1)?s1.getPorcentaje():parsePct(fS1p);
                         socios.add(new Socio(fS1r.getText().trim(),fS1n.getText().trim(),p,parseD(fS1c),1));
                     }
                     if(!fS2n.getText().trim().isEmpty()){
-                        double p=Double.parseDouble(fS2p.getText().trim().replace(",",".").replace("%",""))/100;
+                        // Si el % no se tocó, se conserva el valor guardado tal cual
+                        // (el texto en pantalla puede estar redondeado a 6 decimales).
+                        double p=fS2p.getText().equals(pctOrig2)?s2.getPorcentaje():parsePct(fS2p);
                         socios.add(new Socio(fS2r.getText().trim(),fS2n.getText().trim(),p,parseD(fS2c),2));
                     }
                     emp.setSocios(socios);
@@ -491,6 +497,27 @@ public class HomePanel extends JPanel {
             String ejStr=ejs.isEmpty()?"—":ejs.stream().map(String::valueOf).reduce((a,b)->a+", "+b).orElse("—");
             tableModel.addRow(new Object[]{e.getRazonSocial(),e.getRut(),e.getGiro(),ejStr});
         }
+    }
+
+
+    /**
+     * Fracción (0.6) → texto en % para el campo ("60"; "33,333333").
+     * Hasta 6 decimales, sin ceros sobrantes y siempre con coma decimal,
+     * sin depender del idioma del sistema.
+     */
+    private static String fmtPct(double fraccion) {
+        String t = String.format(java.util.Locale.ROOT, "%.6f", fraccion * 100);
+        t = t.replaceAll("0+$", "").replaceAll("\\.$", "");
+        return t.replace('.', ',');
+    }
+
+    /** Texto del campo % → fracción. Acepta coma o punto; máximo 6 decimales. */
+    private static double parsePct(JTextField f) throws Exception {
+        String t = f.getText().trim().replace(",", ".").replace("%", "").trim();
+        int punto = t.indexOf('.');
+        if (punto >= 0 && t.length() - punto - 1 > 6)
+            throw new Exception("El % de participación admite hasta 6 decimales.");
+        return Double.parseDouble(t) / 100;
     }
 
     private double parseD(JTextField f){

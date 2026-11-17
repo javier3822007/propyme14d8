@@ -8,7 +8,7 @@ $Jar       = Join-Path $ScriptDir "ProPyme.jar"
 $Src       = Join-Path $ScriptDir "src\main\java"
 
 Write-Host "============================================"
-Write-Host "  Sistema ProPyme Transparente v0.12.1"
+Write-Host "  Sistema ProPyme Transparente v0.12.2"
 Write-Host "============================================"
 
 if (-not (Get-Command javac -ErrorAction SilentlyContinue)) {

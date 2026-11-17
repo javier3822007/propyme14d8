@@ -10,6 +10,35 @@ Estados:
 
 
 =================================
+[v0.12.2] — 2026-11  ·  Porcentaje de participación de los socios
+=================================
+
+CORRECCIONES:
+- Editar empresa: el % de participación de un socio ya no se altera al
+  guardar. Antes el campo mostraba el % con un solo decimal y al guardar
+  se volvía a leer desde ese texto: bastaba abrir "Editar empresa" y
+  guardar (aunque solo se corrigiera un nombre o el domicilio) para que
+  un 33,333333 % quedara en 33,3 %. Afectaba solo a porcentajes con más
+  de un decimal (ej. socios en tercios).
+  Ahora el campo muestra el valor completo y, si no se modifica, se
+  conserva exactamente el valor guardado.
+
+CAMBIOS DE CRITERIO:
+- El % de participación admite hasta 6 decimales, al crear y al editar
+  una empresa. Con más decimales se avisa y no se guarda.
+- El % se muestra sin ceros sobrantes (50 en vez de 50,0) y siempre con
+  coma decimal, sin depender del idioma del sistema. Al escribir se
+  siguen aceptando coma o punto.
+
+COMPATIBILIDAD:
+- Sin cambios en cálculos ni en el formato de los datos. Las empresas ya
+  guardadas no se modifican.
+- Si una empresa con porcentajes de más de un decimal se editó y guardó
+  con una versión anterior, revisar el % de sus socios y corregirlo a
+  mano: el valor recortado quedó guardado.
+
+
+=================================
 [v0.12.1] — 2026-11  ·  Ajustes visuales
 =================================
 

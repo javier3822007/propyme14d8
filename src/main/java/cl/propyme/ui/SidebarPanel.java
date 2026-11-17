@@ -126,7 +126,7 @@ public class SidebarPanel extends JPanel {
         saveBtn.addActionListener(e -> frame.guardarTodo());
         add(saveBtn);
 
-        JLabel ver = new JLabel("  v0.12.1  •  ProPyme Transparente");
+        JLabel ver = new JLabel("  v0.12.2  •  ProPyme Transparente");
         ver.setFont(new Font("SansSerif", Font.PLAIN, 9));
         ver.setForeground(new Color(0x44,0x55,0x66));
         ver.setMaximumSize(new Dimension(210, 24));
